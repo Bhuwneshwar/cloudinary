@@ -1,0 +1,61 @@
+<!-- Create an HTML file with a form element -->
+<html>
+  <head>
+    <title>File Upload</title>
+  </head>
+  <body>
+    <h1>File Upload Front End</h1>
+    <form id="upload-form">
+      <!-- Add an input element of type file -->
+      <input type="file" id="file-input" />
+      <!-- Add a submit button -->
+      <button type="submit" id="submit-button">Upload</button>
+    </form>
+    <!-- Add a div element to display the upload result or error -->
+    <div id="upload-result"></div>
+    <!-- Add a script tag to link the JavaScript file -->
+    <script>
+        // Create a JavaScript file that handles the form submission event
+
+// Get the form element by its id
+const uploadForm = document.getElementById("upload-form");
+// Get the input element by its id
+const fileInput = document.getElementById("file-input");
+// Get the div element by its id
+const uploadResult = document.getElementById("upload-result");
+
+// Add an event listener to the form element for the submit event
+uploadForm.addEventListener("submit", function (event) {
+  // Prevent the default behavior of the form submission
+  event.preventDefault();
+  // Get the file from the input element
+  const file = fileInput.files[0];
+  // Check if there is a file selected
+  if (file) {
+    // Create a FormData object to append the file
+    const formData = new FormData();
+    formData.append("file", file);
+    // Send the file to the back end using the fetch API
+    fetch("/upload", {
+      method: "POST",
+      body: formData,
+    })
+      // Parse the response as JSON
+      .then((response) => response.json())
+      // Display the response message in the div element
+      .then((data) => {
+        uploadResult.textContent = data.message;
+      })
+      // Catch and display any error in the div element
+      .catch((error) => {
+        uploadResult.textContent = error.message;
+      });
+  } else {
+    // Display a message in the div element if no file is selected
+    uploadResult.textContent = "Please select a file to upload";
+  }
+});
+
+    </script>
+  </body>
+</html>
