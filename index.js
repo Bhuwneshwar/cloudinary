@@ -25,16 +25,16 @@ cloudinary.config({
 });
 
 // Define a route for file upload
-app.post("/upload", fileUpload.single("file"), async (req, res) =>{
+app.post("/upload", fileUpload.single("file"), async (req, res) => {
   // Create a function that returns a promise for uploading the file
   let streamUpload = (req) => {
     return new Promise((resolve, reject) => {
       let uploadStream = cloudinary.uploader.upload_stream(
-        {
-          folder: "test",
-          public_id: "sample",
-          resource_type: "auto",
-        },
+        // {
+        //           folder: "test",
+        //           public_id: "sample",
+        //           resource_type: "auto",
+        //         },
         (error, result) => {
           if (result) {
             resolve(result);
