@@ -18,24 +18,23 @@ const fileUpload = multer({ storage: multer.memoryStorage() });
 
 // Configure Cloudinary credentials
 cloudinary.config({
-  cloud_name: "",
-  api_key: "",
-  api_secret: "",
-  secure :false, 
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_KEY,
+  api_secret: process.env.CLOUDINARY_SECRET,
+  secure: false,
 });
+
 // Define a route for file upload
-app.post("/upload", fileUpload.single("file"), function (req, res, next) {
+app.post("/upload", fileUpload.single("file"), async (req, res) =>{
   // Create a function that returns a promise for uploading the file
   let streamUpload = (req) => {
     return new Promise((resolve, reject) => {
-      // Create an upload stream with the desired options
       let uploadStream = cloudinary.uploader.upload_stream(
         {
-          folder: "test", // Optional, specify a folder name for your file
-          public_id: "sample", // Optional, specify a public id for your file
-          resource_type: "auto", // Optional, specify the resource type (image, video, raw, auto)
+          folder: "test",
+          public_id: "sample",
+          resource_type: "auto",
         },
-        // Handle the upload result or error in a callback function
         (error, result) => {
           if (result) {
             resolve(result);
@@ -44,31 +43,25 @@ app.post("/upload", fileUpload.single("file"), function (req, res, next) {
           }
         }
       );
-      // Pipe the file buffer to the upload stream
       streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
     });
   };
 
-  // Call the upload function with the request
-  async function upload(req) {
+  const upload = async (req) => {
     try {
-      // Wait for the upload to complete and get the result
       let result = await streamUpload(req);
-      // Log the result to the console
       console.log(result);
-      // Send a success response to the client
       res.status(200).json({ message: "File uploaded successfully" });
     } catch (err) {
-      // Log the error to the console
       console.error(err);
-      // Send an error response to the client
       res.status(500).json({ message: "File upload failed" });
     }
-  }
+  };
 
-  // Invoke the upload function
   upload(req);
 });
-
+const port = process.env.PORT || 5005;
 // Start the server on port 3000
-app.listen(3000, () => console.log("Server running on port 3000"));
+app.listen(port, () =>
+  console.log("Server running on port http://localhost:" + port)
+);
